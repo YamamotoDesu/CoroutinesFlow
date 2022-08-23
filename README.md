@@ -270,3 +270,54 @@ fun generate() = flow {
     }
 }
 ```
+
+## zip
+```kt
+fun main() {
+    runBlocking {
+        zip()
+        /*
+        One in French is Un
+        Two in French is Desx
+        Three in French is Troix
+
+        Process finished with exit code 0
+         */
+    }
+}
+
+suspend fun zip() {
+    val english = flowOf("One", "Two", "Three")
+    val french = flowOf("Un", "Desx", "Troix")
+    english.zip(french) { a, b -> "$a in French is $b"}
+        .collect {
+            println(it)
+        }
+}
+```
+
+## combine
+```kt 
+fun main() {
+    runBlocking {
+        combine()
+        /*
+        1 -> One
+        2 -> Two
+        3 -> Three
+        4 -> Four
+        5 -> Five
+
+        Process finished with exit code 0
+         */
+    }
+}
+
+suspend fun combine() {
+    val numbers = (1..5).asFlow().onEach { delay(300L) }
+    val values = flowOf("One", "Two", "Three", "Four", "Five").onEach { delay(300L) }
+    numbers.combine(values) { a, b ->
+        "$a -> $b"
+    }.collect { println(it)}
+}
+```
