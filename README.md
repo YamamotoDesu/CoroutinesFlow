@@ -321,3 +321,58 @@ suspend fun combine() {
     }.collect { println(it)}
 }
 ```
+
+## Exception Handling
+```kt
+fun main() {
+    runBlocking {
+        tryCatch()
+        /*
+        1
+        Caught exception java.lang.IllegalStateException: Check failed.
+         */
+        catch()
+        /*
+        1
+        Caught exception java.lang.IllegalStateException: Check failed.
+
+         */
+        onCompletion()
+        /*
+        1
+        Flow completed with exception java.lang.IllegalStateException: Check failed.
+        Caught exception java.lang.IllegalStateException: Check failed.
+         */
+    }
+}
+
+suspend fun onCompletion() {
+    (1..3).asFlow()
+        .onEach { check(it != 2) }
+        .onCompletion { e ->
+            if(e != null)
+                println("Flow completed with exception $e")
+            else
+                println("Flow completed successfully")
+        }
+        .catch { e -> println("Caught exception $e") }
+        .collect { println(it)}
+}
+
+suspend fun catch() {
+    (1..3).asFlow()
+        .onEach { check(it != 2) }
+        .catch { e -> println("Caught exception $e") }
+        .collect { println(it)}
+}
+
+suspend fun tryCatch() {
+    try {
+        (1..3).asFlow()
+            .onEach { check(it != 2) }
+            .collect { println(it)}
+    } catch (e: Exception) {
+        println("Caught exception $e")
+    }
+}
+```
